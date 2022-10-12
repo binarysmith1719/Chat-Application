@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddUser"
+    android:id="@+id/add_user"
+    android:background="@color/greenultra">
+
+    <ProgressBar
+        android:id="@+id/pgbr"
+        android:layout_width="114dp"
+        android:layout_height="104dp"
+        app:layout_constraintBottom_toBottomOf="@+id/add_user"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/add_user">
+
+    </ProgressBar>
+    <TextView
+        android:id="@+id/Txt_lst1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ENTER FRIEND'S USER ID"
+        app:layout_constraintEnd_toEndOf="parent"
+         android:layout_marginTop="200dp"
+        android:textStyle="italic"
+        android:paddingLeft="20dp"
+        android:textSize="50sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/add_user"></TextView>
+
+    <EditText
+        android:id="@+id/edtxlst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter the id here"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/edt_backgrnd"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Txt_lst1"></EditText>
+
+    <Button
+        android:id="@+id/btnlst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ADD"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/btn_backgrnd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtxlst"></Button>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

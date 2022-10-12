@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/rl_noti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/img_noti"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/logonew">
+        </ImageView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/img_noti"
+            android:text="ChatApp"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:paddingLeft="7dp"
+            android:textSize="20sp"
+            android:id="@+id/txt_noti">
+        </TextView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/txt_noti"
+            android:layout_marginTop="25dp"
+            android:layout_toRightOf="@+id/img_noti"
+            android:paddingLeft="7dp"
+            android:text="ChatApp Notification"
+            android:textSize="15sp"
+            android:id="@+id/txt_noyi_msg"></TextView>
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
