@@ -91,7 +91,7 @@ public class ChatActivity extends AppCompatActivity {
                String msg = edtx.getText().toString();
                if(msg.equals(""))
                    return;
-//                  Log.d("bug", "Message on click : "+msg);
+
                Message msgObject = new Message(msg,Senderid);
 
                mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject).
