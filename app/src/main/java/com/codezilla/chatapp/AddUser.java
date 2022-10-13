@@ -57,7 +57,7 @@ public class AddUser extends AppCompatActivity {
 
                          //CHECKING IF THIS ID IS ALREADY A FRIEND
                          enter=1;
-                         mDbRef.child("Friends").child(OwnId).addValueEventListener(new ValueEventListener() {
+                         mDbRef.child("Friends").child(OwnId).addListenerForSingleValueEvent(new ValueEventListener() {
                              @Override
                              public void onDataChange(@NonNull DataSnapshot snapshot) {
 
