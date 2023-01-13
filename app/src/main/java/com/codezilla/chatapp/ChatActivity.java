@@ -32,6 +32,7 @@ public class ChatActivity extends AppCompatActivity {
     private String senderroom;
     private String recieverroom;
     private DatabaseReference mDbRef;
+    private String str;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
