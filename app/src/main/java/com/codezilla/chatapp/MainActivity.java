@@ -22,13 +22,19 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceIdReceiver;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -92,6 +98,7 @@ private ProgressBar pgbr;
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+        UpdateToken();
         //*******************************************************************
 //        pgbr.setVisibility(View.INVISIBLE);
     }
@@ -129,5 +136,32 @@ private ProgressBar pgbr;
            startActivity(intent);
        }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static String tkn="0";
+    public void UpdateToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+
+                        if (!task.isSuccessful()) {
+                            Log.d("bug", "Fetching FCM registration token failed");
+                            return;
+                        }
+                        // Get new FCM registration token
+                        tkn = task.getResult();
+                        mDbRef.child("Token").child(mAuth.getCurrentUser().getUid()).setValue(tkn);
+                        // Toast.makeText(MainActivity.this, "messaging yey"+task.getResult(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+        mDbRef.child("User").child(mAuth.getCurrentUser().getUid()).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                UserDetails.uname=snapshot.getValue(String.class);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 }
