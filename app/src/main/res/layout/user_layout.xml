@@ -7,7 +7,8 @@
     android:layout_marginTop="8dp"
     android:layout_marginLeft="7dp"
     android:layout_marginRight="7dp"
-    android:backgroundTint="@color/teal_700"
+    android:backgroundTint="@color/white"
+    app:cardElevation="20dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -15,7 +16,7 @@
         android:layout_height="60dp"
         android:paddingRight="7dp"
         android:paddingLeft="5dp"
-        android:src="@drawable/usericon">
+        android:src="@drawable/userabc">
 
     </ImageView>
 
@@ -26,9 +27,11 @@
         android:layout_marginLeft="60dp"
         android:paddingTop="12dp"
         android:paddingBottom="18dp"
+        android:fontFamily="@font/quicksand_medium"
+        android:paddingLeft="15dp"
         android:text="Subham"
         android:textSize="20dp"
-        android:textColor="@color/white"
+        android:textColor="@color/blackarsenic"
         >
 
     </TextView>

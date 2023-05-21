@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatActivity"
-    android:backgroundTint="@color/lightgreen">
+    android:background="@color/blackarsenic">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvchat"
@@ -13,43 +13,43 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/llayt"
         android:layout_alignParentTop="true"
-        android:background="@color/lightgreen"
-        android:backgroundTint="@color/lightgreen">
+        android:background="@color/blackarsenic"
+        android:backgroundTint="@color/blackarsenic">
     </androidx.recyclerview.widget.RecyclerView>
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/llayt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="100"
-        android:background="@color/lightgreen"
-        android:backgroundTint="@color/lightgreen">
+        android:background="@color/blackarsenic">
 
         <EditText
             android:id="@+id/edt_write"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:hint="Type the message"
-            android:layout_weight="80"
-            android:paddingLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="4dp"
-            android:textColor="@color/black"
-            android:background="@drawable/message_background">
+            android:layout_height="60dp"
+            android:padding="18dp"
+            android:hint="Type Here"
+            android:layout_toLeftOf="@+id/img_send"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/quicksand_medium"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="9dp"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_write_msg">
         </EditText>
+
         <ImageView
             android:id="@+id/img_send"
-            android:layout_marginTop="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/sending"
-            android:layout_weight="20">
-        </ImageView>
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_weight="20"
+            android:layout_marginRight="9dp"
+            android:src="@drawable/share"></ImageView>
 
-
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </RelativeLayout>

@@ -28,8 +28,8 @@ public class SignupAct extends AppCompatActivity {
     private EditText editTxtName;
     private EditText editTextEmail;
     private EditText editTextPass;
-    private FirebaseAuth mAuth;
-    private DatabaseReference mDbRef;
+    private FirebaseAuth mAuth;                //BACKEND
+    private DatabaseReference mDbRef;          //BACKEND
     private String name;
     private String MAIN_KEY="main key";
     String str2;

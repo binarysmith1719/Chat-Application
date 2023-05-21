@@ -6,11 +6,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -32,7 +39,6 @@ public class ChatActivity extends AppCompatActivity {
     private String senderroom;
     private String recieverroom;
     private DatabaseReference mDbRef;
-    private String str;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +48,18 @@ public class ChatActivity extends AppCompatActivity {
         String reciever = intent.getStringExtra("NAME_KEY");
         String Recieverid = intent.getStringExtra("UID_KEY");
 
+        //Changing status bar color
+        if (Build.VERSION.SDK_INT >= 21) {
+            Window window = this.getWindow();
+//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(this.getResources().getColor(R.color.black));
+        }
+
+        //Color.parseColor("#FF0000")
+        ColorDrawable cd= new ColorDrawable(getResources().getColor(R.color.black));
         getSupportActionBar().setTitle(reciever);
+        getSupportActionBar().setBackgroundDrawable(cd);
 
         mDbRef = FirebaseDatabase.getInstance().getReference();
 
@@ -89,11 +106,16 @@ public class ChatActivity extends AppCompatActivity {
               @Override
               public void onClick(View view) {
                   Log.d("bug","here2");
-               String msg = edtx.getText().toString();
-               if(msg.equals(""))
-                   return;
+                  String msg = edtx.getText().toString();
+                  if(msg.equals(""))
+                    return;
 
-               Message msgObject = new Message(msg,Senderid);
+                  Calendar c = Calendar.getInstance();
+                  int hr =c.get(Calendar.HOUR_OF_DAY);
+                  int min=c.get(Calendar.MINUTE);
+                  Toast.makeText(ChatActivity.this, "hr->"+hr+" min->"+min, Toast.LENGTH_SHORT).show();
+                  String sendingtime= hr+":"+min+"";
+               Message msgObject = new Message(msg,Senderid,sendingtime);
 
                mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject).
                        addOnSuccessListener(new OnSuccessListener<Void>() {

@@ -7,16 +7,40 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:hint="MessageSent"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="7dp"
-        android:paddingRight="7dp"
-        android:background="@drawable/btn_backgrnd"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="8dp"
+        android:text="Message recieved"
+        android:fontFamily="@font/quicksand_medium"
+        android:textStyle="bold"
+        android:paddingVertical="18dp"
+        android:paddingLeft="22dp"
+        android:paddingRight="15dp"
+        android:background="@drawable/bg_reciever"
         android:textColor="@color/white"
         android:layout_alignParentLeft="true">
-
     </TextView>
+    <ImageView
+        android:layout_width="18dp"
+        android:src="@drawable/playbuttonparrot"
+        android:id="@+id/voice"
+        android:paddingLeft="5dp"
+        android:layout_alignTop="@+id/txtrecieve"
+        android:layout_alignBottom="@+id/txtrecieve"
+        android:layout_alignLeft="@+id/txtrecieve"
+        android:layout_height="20dp">
+    </ImageView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:id="@+id/timex"
+        android:textStyle="normal"
+        android:text="20:33"
+        android:textSize="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/white"
+        android:layout_alignBottom="@+id/txtrecieve"
+        android:layout_alignRight="@+id/txtrecieve"
+        android:fontFamily="@font/quicksand_light"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
