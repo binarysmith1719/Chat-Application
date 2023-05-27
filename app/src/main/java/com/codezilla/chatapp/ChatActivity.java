@@ -86,6 +86,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        flag=0;
         UserActive.isActive=true;
         apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         Intent intent = getIntent();

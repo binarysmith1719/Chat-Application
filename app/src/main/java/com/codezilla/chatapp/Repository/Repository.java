@@ -35,7 +35,7 @@ public class Repository implements ChatActivity.onBackPressListener {
     public boolean isListAvailable=true;  //SEMAPHORE  ---> SYNCHRONIZING [childAdditionListener,backgroundTask,stimulating the ViewModel through interface]
     int onlyonce=0;                       //MAKES SURE THAT THE childAdditionListener DO NOT +ADD ANY DATA TO THE LIST ON INITIALIZATION
     public Repository(onFirestoreTaskComplete onFirestoreTaskCompleteRef) {
-//        Log.d("tag"," Repository Initializing ");
+        Log.d("Repo"," Repository Initializing ");
         this.onFirestoreTaskCompleteRef = onFirestoreTaskCompleteRef;
         chatListx=new ArrayList<>();
         ChatActivity.ref=this;
@@ -48,7 +48,7 @@ public class Repository implements ChatActivity.onBackPressListener {
         }
         onlyonce=0;
 //        Log.d("OnCancel","BackPress chkr chatList size => "+chatListx.size());
-        mDbRef.child("chats").child(senderroom).child("messages").addListenerForSingleValueEvent(new ValueEventListener() {
+        mDbRef.child("chats").child(senderroom).child("messages").orderByChild("id").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                Log.d("tag"," onDateChangeId -> "+Thread.currentThread().getId());
@@ -66,9 +66,9 @@ public class Repository implements ChatActivity.onBackPressListener {
 
     public void onChildAddition(String senderroom)
     {
-        Log.d(TAG,"onChildAddition ^^^^^^^^^ called ");
+//        Log.d(TAG,"onChildAddition ^^^^^^^^^ called ");
 
-        mDbRef.child("chats").child(senderroom).child("messages").limitToLast(1).addChildEventListener(new ChildEventListener() {
+        mDbRef.child("chats").child(senderroom).child("messages").orderByChild("id").limitToLast(1).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if(onlyonce==1) {
