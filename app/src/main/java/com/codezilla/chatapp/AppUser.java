@@ -4,6 +4,7 @@ public class AppUser {
     public String name;
     public String email;
     public String uid;
+    public String NodeKeyForDeletion="";  // DB-->Friends-->Userid--> Node_KEY_of_each_friend
     public AppUser(String name,String email,String uid)
     {
         this.name=name;

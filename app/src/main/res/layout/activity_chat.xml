@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatActivity"
+    android:id="@+id/mainLayout"
     android:background="@color/blackarsenic">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -27,17 +28,17 @@
             android:id="@+id/edt_write"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:padding="18dp"
-            android:hint="Type Here"
-            android:layout_toLeftOf="@+id/img_send"
             android:layout_alignParentLeft="true"
-            android:fontFamily="@font/quicksand_medium"
             android:layout_centerVertical="true"
             android:layout_marginHorizontal="9dp"
             android:layout_marginTop="20dp"
-            android:textColor="@color/white"
-            android:background="@drawable/bg_write_msg">
-        </EditText>
+            android:layout_toLeftOf="@+id/img_send"
+            android:background="@drawable/bg_write_msg"
+            android:fontFamily="@font/quicksand_medium"
+            android:hint="Type Here"
+            android:inputType="numberPassword"
+            android:padding="18dp"
+            android:textColor="@color/white"></EditText>
 
         <ImageView
             android:id="@+id/img_send"

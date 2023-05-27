@@ -48,6 +48,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 Intent intent = new Intent(context,ChatActivity.class);
                 intent.putExtra("NAME_KEY",user.getName());
                 intent.putExtra("UID_KEY", user.getUid());
+                intent.putExtra("NODEKEY",user.NodeKeyForDeletion);
                 context.startActivity(intent);
             }
         });

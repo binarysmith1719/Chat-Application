@@ -2,6 +2,7 @@ package com.codezilla.chatapp;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +25,8 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.codezilla.chatapp.RsaEncryption.MyKeyPair;
+import com.codezilla.chatapp.RsaEncryption.RsaAlgo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,6 +64,7 @@ private ProgressBar pgbr;
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(this.getResources().getColor(R.color.purple_200));
         }
+
         pgbr = findViewById(R.id.pgbr_m);
         RwView = findViewById(R.id.RwView);
         userList = new ArrayList<AppUser>();
@@ -75,6 +79,18 @@ private ProgressBar pgbr;
         mAuth = FirebaseAuth.getInstance();
         mDbRef= FirebaseDatabase.getInstance().getReference();
 
+        //GETTING THE KEYPAIR (PUBLIC_KEY , PRIVATE_KEY)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d("tag","key initial");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    MyKeyPair.initializeKeyPair();
+                    mDbRef.child("PublicKeys").child(mAuth.getCurrentUser().getUid()).setValue(MyKeyPair.StrPublickey);
+                }
+            }).start();
+        }
+
         //FRIENDS ----> CURRENT USER_ID ----> {LIST OF FRIENDS}
         mDbRef.child("Friends").child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -86,6 +102,7 @@ private ProgressBar pgbr;
                    userList.clear();
                    for (DataSnapshot datasnapshot:snapshot.getChildren()) {//EACH FRIEND'S SNAPSHOT
                        AppUser apu = datasnapshot.getValue(AppUser.class); //EACH FRIEND'S OBJECT
+                       apu.NodeKeyForDeletion=datasnapshot.getKey(); //INSERTING THE NODE KEY OF THE FRIEND FOR DELETION PURPOSE
                        //CHECKING IF THE DATA MATCHES THE CURRENT USER ID
                        if(!(apu.getUid().equals(mAuth.getCurrentUser().getUid())))
                        { userList.add(apu);}
@@ -138,8 +155,10 @@ private ProgressBar pgbr;
         return super.onOptionsItemSelected(item);
     }
 
+    //UPDATING THE USERS TOKEN AS IT FREQUENTLY GETS RENEWED BY THE SYSTEM
     public static String tkn="0";
     public void UpdateToken(){
+        Log.d("tag",tkn);
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
@@ -155,6 +174,7 @@ private ProgressBar pgbr;
                         // Toast.makeText(MainActivity.this, "messaging yey"+task.getResult(), Toast.LENGTH_SHORT).show();
                     }
                 });
+
         mDbRef.child("User").child(mAuth.getCurrentUser().getUid()).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

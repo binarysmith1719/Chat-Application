@@ -1,6 +1,9 @@
 package com.codezilla.chatapp;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +16,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.codezilla.chatapp.RsaEncryption.MyKeyPair;
+import com.codezilla.chatapp.RsaEncryption.RsaAlgo;
+import com.codezilla.chatapp.RsaEncryption.RsaEncryptionHandler;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -59,9 +65,25 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
                  Log.d("bug","here onBind");
                  Message currentMessage= MessageList.get(position);
+
+                 String isEncrypted="";
+                 if(currentMessage.publickey.equals("1")){
+                         isEncrypted="e ";
+                 }
+
                  if(SendViewHolder.class==holder.getClass())
                  {
-                          ((SendViewHolder) holder).TxtSent.setText(currentMessage.getMessage());
+                          String text;
+                          if(currentMessage.getMessage()==null){
+                             text="SECURITY KEY CHANGED";
+//                             ((SendViewHolder) holder).TxtSent.setTextColor(Color.parseColor("#2A2F4F"));
+                          }
+                          else{
+                              text= currentMessage.getMessage();
+//                              ((SendViewHolder) holder).TxtSent.setTextColor(Color.parseColor("#FFFFFFFF"));
+                          }
+                          ((SendViewHolder) holder).isEncrypted.setText(isEncrypted);
+                          ((SendViewHolder) holder).TxtSent.setText(text);
                           ((SendViewHolder) holder).voice.setOnClickListener(new View.OnClickListener() {
                               @Override
                               public void onClick(View v) {
@@ -75,7 +97,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                  }
                  else
                  {
-                     ((RecieveViewHolder) holder).TxtReciv.setText(currentMessage.getMessage());
+                     String text;
+                     if(currentMessage.getMessage()==null){
+                         text="SECURITY KEY CHANGED";
+//                         ((RecieveViewHolder) holder).TxtReciv.setTextColor(Color.parseColor("#F07900"));
+                     }
+                     else{
+                         text= currentMessage.getMessage();
+//                         ((RecieveViewHolder) holder).TxtReciv.setTextColor(Color.parseColor("#FFFFFFFF"));
+                     }
+
+                     ((RecieveViewHolder) holder).isEncrypted.setText(isEncrypted);
+                     ((RecieveViewHolder) holder).TxtReciv.setText(text);
                      ((RecieveViewHolder) holder).voice.setOnClickListener(new View.OnClickListener() {
                          @Override
                          public void onClick(View v) {
@@ -117,7 +150,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class SendViewHolder extends RecyclerView.ViewHolder{
-       public TextView TxtSent,Txttime;
+       public TextView TxtSent,Txttime,isEncrypted;
        public ImageView voice;
         public SendViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -125,10 +158,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             TxtSent=itemView.findViewById(R.id.txtsent);
             voice=itemView.findViewById(R.id.voice);
             Txttime=itemView.findViewById(R.id.timex);
+            isEncrypted=itemView.findViewById(R.id.isEncrypted);
         }
     }
     class RecieveViewHolder extends RecyclerView.ViewHolder{
-        public TextView TxtReciv,Txttime;
+        public TextView TxtReciv,Txttime,isEncrypted;
         public ImageView voice;
         public RecieveViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -136,6 +170,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             TxtReciv=itemView.findViewById(R.id.txtrecieve);
             voice=itemView.findViewById(R.id.voice);
             Txttime=itemView.findViewById(R.id.timex);
+            isEncrypted=itemView.findViewById(R.id.isEncrypted);
         }
     }
 }

@@ -4,7 +4,8 @@
     package="com.codezilla.chatapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <application
         android:name=".Notification.App"
         android:allowBackup="true"

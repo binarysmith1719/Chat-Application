@@ -76,7 +76,7 @@ public class AddUser extends AppCompatActivity {
                                              apu = snapshot.getValue(AppUser.class);
                                              mDbRef.child("Friends").child(OwnId).push().setValue(apu);
                                              Toast.makeText(AddUser.this, "Friend Added", Toast.LENGTH_SHORT).show();
-
+                                             onBackPressed();
                                          }
                                          @Override
                                          public void onCancelled(@NonNull DatabaseError error) {}});

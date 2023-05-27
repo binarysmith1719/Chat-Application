@@ -2,7 +2,9 @@ package com.codezilla.chatapp;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Message;
 import android.view.textclassifier.ConversationActions;
 
@@ -17,6 +19,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.security.KeyFactory;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
@@ -24,11 +28,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String title=message.getData().get("Title");
         String messagex = message.getData().get("Message");
 
+        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+        PendingIntent pendingIntent= PendingIntent.getActivity(this,0,intent,0);
         if(!UserActive.isActive || (UserActive.isActive&&(!title.equals(UserActive.chattingWith))) ) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "0")
                     .setSmallIcon(R.drawable.ic_baseline_notifications_24)
                     .setContentTitle(title)
                     .setContentText(messagex)
+                    .setContentIntent(pendingIntent)
                     .setPriority(Notification.PRIORITY_HIGH);
             // NotificationManager nm= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationManagerCompat nm = NotificationManagerCompat.from(getApplicationContext());
@@ -50,6 +57,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         MainActivity.tkn=token;
-        FirebaseDatabase.getInstance().getReference().child("Token").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(token);
+//        FirebaseDatabase.getInstance().getReference().child("Token").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(token);
     }
 }
