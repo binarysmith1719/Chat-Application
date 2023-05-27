@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/llayt"
         android:layout_alignParentTop="true"
+        android:scrollbars="vertical"
         android:background="@color/blackarsenic"
         android:backgroundTint="@color/blackarsenic">
     </androidx.recyclerview.widget.RecyclerView>

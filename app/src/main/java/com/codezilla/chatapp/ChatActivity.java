@@ -18,6 +18,7 @@ import android.graphics.RenderNode;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -242,7 +243,8 @@ public class ChatActivity extends AppCompatActivity {
                        Toast.makeText(ChatActivity.this, "Cannot encrypt as reciever is not updated", Toast.LENGTH_LONG).show();
                        return;
                    }
-                   new Thread(new Runnable() {
+                   Handler handler= new Handler(getMainLooper());
+                   handler.post(new Runnable() {
                        @Override
                        public void run() {
                            Message msgObject2 = new Message(msg,Senderid,sendingtime,id); //This will be stored in SenderRoom
@@ -251,6 +253,11 @@ public class ChatActivity extends AppCompatActivity {
                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                //for reciever
                                m=RsaEncryptionHandler.encryptMessageForReciever(msg,recieverPublicKey);
+                               if(m==null)
+                               {
+                                   Toast.makeText(ChatActivity.this, "Too BIG to ENCRYPT", Toast.LENGTH_SHORT).show();
+                                   return ;
+                               }
                                msgObject.setMessage(m);
                                msgObject.setPublickey("1");
 
@@ -259,7 +266,7 @@ public class ChatActivity extends AppCompatActivity {
                                msgObject2.setMessage(m);
                                msgObject2.setPublickey("1");
                            }
-
+                           edtx.setText("");
                            mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject2).
                                    addOnSuccessListener(new OnSuccessListener<Void>() {
                                        @Override
@@ -269,7 +276,8 @@ public class ChatActivity extends AppCompatActivity {
                                        }
                                    });
                        }
-                   }).start();
+                   });
+
                }
                else { // WHEN ENCRYPTION IS OFF
                    new Thread(new Runnable() {
@@ -285,6 +293,7 @@ public class ChatActivity extends AppCompatActivity {
                                    });
                        }
                    }).start();
+                   edtx.setText("");
                }
 
                //***************  Sending the Notification ******************************************
@@ -304,7 +313,6 @@ public class ChatActivity extends AppCompatActivity {
                    }
                }).start();
                //*************XXXXXX Sending Notifiacation XXXXXX************************************
-               edtx.setText("");
               }
           });
 

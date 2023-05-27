@@ -21,6 +21,7 @@ import com.google.firebase.database.ThrowOnExtraProperties;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Array;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class Repository implements ChatActivity.onBackPressListener {
                        asyncTask = (DbAsyncTask) new DbAsyncTask().execute(snapshot);
                     }
                     else
-                        onlyonce=1;
+                        onlyonce=2;
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
@@ -68,19 +69,26 @@ public class Repository implements ChatActivity.onBackPressListener {
     {
 //        Log.d(TAG,"onChildAddition ^^^^^^^^^ called ");
 
-        mDbRef.child("chats").child(senderroom).child("messages").orderByChild("id").limitToLast(1).addChildEventListener(new ChildEventListener() {
+        mDbRef.child("chats").child(senderroom).child("messages").orderByChild("id").limitToLast(2).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(onlyonce==1) {
+                if(onlyonce==2) {
 //                    Log.d(TAG,"%%%%%%%%%%%%%-%% ON THREAD %%%%%% {"+(count++)+" } %%%%%%%---%%% ");
                             while(!isListAvailable);
                             isListAvailable=false;
                             //EXCLUSIVE LOCK ACQUIRED
 //                            Log.d("tagon","ON DATA ADDED aquired the SEMAPHORE Background-> "+Thread.currentThread().getId());
                                 Message msgobj = snapshot.getValue(Message.class);
+                                String decryptedMessage="";
                                 if (msgobj.publickey.equals("1")) {
                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                      String decryptedMessage = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
+                                       try {
+                                           decryptedMessage = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
+                                       }
+                                       catch (Exception e){
+                                           decryptedMessage="NULL MESSAGE";
+                                           msgobj.publickey="0";
+                                       }
                                       msgobj.setMessage(decryptedMessage);
                                    }
                                 }
@@ -92,7 +100,7 @@ public class Repository implements ChatActivity.onBackPressListener {
                 }
                 else{
 //                    Log.d("tagon","&&&&&&&&&&-&& ONLY ONCE &&&& {"+(count++)+" } &&&&&&&&---&&& ");
-                    onlyonce=1;}
+                    onlyonce+=1;}
 //                Log.d("tag"," Child Added ");
 //                if (semaphore == 0) {
 //                    Message msg = snapshot.getValue(Message.class);
@@ -189,7 +197,13 @@ public class Repository implements ChatActivity.onBackPressListener {
                     String msgx = "";
                     if (msgobj.publickey.equals("1")) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                          msgx = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
+                            try {
+                                msgx = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
+                            }
+                            catch (Exception e){
+                                msgx="NULL MESSAGE";
+                                msgobj.publickey="0";
+                            }
                           msgobj.setMessage(msgx);
                         }
                     }
