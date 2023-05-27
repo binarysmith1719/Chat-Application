@@ -87,6 +87,7 @@ public class Repository implements ChatActivity.onBackPressListener {
                                 chatListx.add(msgobj);
                             //EXCLUSIVE LOCK ACQUIRED
                             isListAvailable=true;
+                            ChatActivity.flag=0;// TO ALLOW THE RECYCLER VIEW TO SCROLL TO THE END
                     callingInterface();
                 }
                 else{

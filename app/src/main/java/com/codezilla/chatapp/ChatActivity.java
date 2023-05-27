@@ -81,7 +81,7 @@ public class ChatActivity extends AppCompatActivity {
     public static  onBackPressListener ref=null;
     private APIService apiService;
     public String recieverPublicKey="";
-    int flag=0; //ALLOWS TO SCROLL RECYCLER VIEW TO LAST POSITION ONLY ONCE
+    public static int flag=0; //ALLOWS TO SCROLL RECYCLER VIEW TO LAST POSITION ONLY RECEIVER REPLIES OR USER ENDS NEW MESSAGES
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +128,6 @@ public class ChatActivity extends AppCompatActivity {
 //        msgAdapter.submitList(chatList);
 //        msgAdapter = new MessageAdapter(this,chatList);
         rview.setAdapter(msgAdapter);
-
 //        rview.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event) {
@@ -137,7 +136,6 @@ public class ChatActivity extends AppCompatActivity {
 //                return true;
 //            }
 //        });
-
         String Senderid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         senderroom = Senderid + Recieverid;
         recieverroom = Recieverid + Senderid;
