@@ -36,7 +36,6 @@
             android:background="@drawable/bg_write_msg"
             android:fontFamily="@font/quicksand_medium"
             android:hint="Type Here"
-            android:inputType="numberPassword"
             android:padding="18dp"
             android:textColor="@color/white"></EditText>
 

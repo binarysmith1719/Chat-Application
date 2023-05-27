@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -64,7 +65,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ChatActivity extends AppCompatActivity implements RecyclerView.OnItemTouchListener {
+public class ChatActivity extends AppCompatActivity {
+    private static final String TAG = "ChatActivity";
     private RelativeLayout relativeLayout;
     private RecyclerView rview;
     private EditText edtx;
@@ -76,11 +78,10 @@ public class ChatActivity extends AppCompatActivity implements RecyclerView.OnIt
     private String recieverNodeKey;
     private TaskViewModel taskViewModel;
     private DatabaseReference mDbRef;
+    public static  onBackPressListener ref=null;
     private APIService apiService;
     public String recieverPublicKey="";
-    int maxMsgId ; // BEING USED FOR GIVING IDs TO THE MESSAGES IN THE RECYCLER VIEW
     int flag=0; //ALLOWS TO SCROLL RECYCLER VIEW TO LAST POSITION ONLY ONCE
-    int count=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,36 +144,33 @@ public class ChatActivity extends AppCompatActivity implements RecyclerView.OnIt
 
 
         //****************** Populating RecyclerView ***************
-        taskViewModel= new ViewModelProvider(this).get(TaskViewModel.class);
-        taskViewModel.probeRepository(senderroom).observe(this, new Observer<List<Message>>() {
+        taskViewModel= new ViewModelProvider(this).get(TaskViewModel.class);      //NO NEW OBJECT FOR VIEWMODEL IS CREATED WHEN LIFECYCLE CHANGES
+        taskViewModel.probeRepository(senderroom);
+        taskViewModel.messageData.observe(this, new Observer<List<Message>>() {
             @Override
             public void onChanged(List<Message> messageList) {
+//                Toast.makeText(ChatActivity.this, "on chatActivity", Toast.LENGTH_SHORT).show();
 //                Log.d("tag",messageList.size()+" observed list size");
 //                maxMsgId=Integer.MAX_VALUE;
-                chatList=new ArrayList<>(messageList);
-
-                for(int i=0;i<chatList.size();i++)
-                {
-
-                }
-//                int n=messageList.size();
-//                for(int i=n-1;i>=0;i--){
-//                    Message msg=messageList.get(i);
-//                    msg.id=""+maxMsgId--;
-//                    chatList.add(0,msg);
-//                }
-                msgAdapter.submitList(chatList, new Runnable() {
-                    @Override
-                    public void run() {
-                        if(flag==0){
-                            rview.scrollToPosition(msgAdapter.getItemCount()-1);flag=1;
+//                Log.d("OnCancel","messageList.Size ->"+messageList.size()+"    adaptersize"+msgAdapter.getItemCount());
+                if (messageList.size()>msgAdapter.getItemCount()) {
+                    chatList = new ArrayList<>(messageList);
+//                    for (int i = 0; i < chatList.size(); i++) {
+//                        Log.d(TAG, "chatList[" + i + "] = " + chatList.get(i));
+//                    }
+                    msgAdapter.submitList(chatList, new Runnable() {   //THIS CALLBACK IS CALLED WHEN THE
+                        @Override
+                        public void run() {
+                            if (flag == 0) {
+                                rview.scrollToPosition(msgAdapter.getItemCount() - 1);
+                                flag = 1;
+                            }
                         }
-                    }
-                });
-
-                if(flag==0) {
-                rview.scrollToPosition(msgAdapter.getItemCount());
-//                    flag=1;
+                    });
+//                    if (flag == 0) {
+//                        rview.scrollToPosition(msgAdapter.getItemCount());
+////                    flag=1;
+//                    }
                 }
             }
         });
@@ -211,15 +209,13 @@ public class ChatActivity extends AppCompatActivity implements RecyclerView.OnIt
           imgv.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View view) {
-//                  rview.scrollToPosition(msgAdapter.getItemCount()-1);
-                  Log.d("bug","here2");
-                  flag=0;
+//                  Log.d("bug","here2");
 //                  InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 //                  imm.hideSoftInputFromWindow(relativeLayout.getWindowToken(), 0);
                   String msg = edtx.getText().toString();
                   if(msg.equals(""))
                     return;
-
+                  flag=0;
 
                   Calendar c = Calendar.getInstance();
                   int hr =c.get(Calendar.HOUR_OF_DAY);
@@ -231,11 +227,11 @@ public class ChatActivity extends AppCompatActivity implements RecyclerView.OnIt
                   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");    //sdf is SimpleDateFormat Object
                   Date date = null;
 
-                  try {date = sdf.parse(startingdate);}                 //date from string to --> Date Format}
+                  try {date = sdf.parse(startingdate);}                                //date from string to --> Date Format}
                   catch (Exception e)
                   { e.printStackTrace();}
 
-                  long starttime = date.getTime();               //total time till this date from 01/01/1970 [in ms].
+                  long starttime = date.getTime();                                     //total time till this date from 01/01/1970 [in ms].
                   long crnttime = System.currentTimeMillis();
                   crnttime= crnttime-starttime ;
 
@@ -438,17 +434,17 @@ public class ChatActivity extends AppCompatActivity implements RecyclerView.OnIt
     }
 
     @Override
-    public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-        return false;
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(ref != null){
+            ref.onBackPressByUser();// CANCELING THE BACKGROUND TASK
+        }
+
     }
 
-    @Override
-    public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-        Toast.makeText(this, "here"+count, Toast.LENGTH_SHORT).show();
-        count++;
+    //THIS LISTENER WILL STOP THE BACKGROUND WORK ON BACKPRESS
+    public interface onBackPressListener{
+        public void onBackPressByUser();
     }
 
-    @Override
-    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-    }
 }
