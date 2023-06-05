@@ -52,7 +52,7 @@ public class Repository implements ChatActivity.onBackPressListener {
         mDbRef.child("chats").child(senderroom).child("messages").orderByChild("id").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                Log.d("tag"," onDateChangeId -> "+Thread.currentThread().getId());
+                Log.d("tag"," onDateChange Id -> "+Thread.currentThread().getId());
                     if (chatListx.size() < snapshot.getChildrenCount()) {
                        asyncTask = (DbAsyncTask) new DbAsyncTask().execute(snapshot);
                     }
@@ -69,31 +69,25 @@ public class Repository implements ChatActivity.onBackPressListener {
     {
 //        Log.d(TAG,"onChildAddition ^^^^^^^^^ called ");
 
-        mDbRef.child("chats").child(senderroom).child("messages").orderByChild("id").limitToLast(2).addChildEventListener(new ChildEventListener() {
+        mDbRef.child("chats").child(senderroom).child("messages").limitToLast(2).orderByChild("id").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if(onlyonce==2) {
-//                    Log.d(TAG,"%%%%%%%%%%%%%-%% ON THREAD %%%%%% {"+(count++)+" } %%%%%%%---%%% ");
-                            while(!isListAvailable);
-                            isListAvailable=false;
-                            //EXCLUSIVE LOCK ACQUIRED
+//                    Log.d(TAG,"%%%%%%%%%%%%%-%% ON THREAD %%%%%% {"+(count++)+" } %%%%%%%---%%% ")
 //                            Log.d("tagon","ON DATA ADDED aquired the SEMAPHORE Background-> "+Thread.currentThread().getId());
                                 Message msgobj = snapshot.getValue(Message.class);
                                 String decryptedMessage="";
                                 if (msgobj.publickey.equals("1")) {
                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                       try {
-                                           decryptedMessage = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
-                                       }
-                                       catch (Exception e){
-                                           decryptedMessage="NULL MESSAGE";
-                                           msgobj.publickey="0";
-                                       }
-                                      msgobj.setMessage(decryptedMessage);
+                                       decryptedMessage = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
+                                       msgobj.setMessage(decryptedMessage);
                                    }
                                 }
-                                chatListx.add(msgobj);
+                            while(!isListAvailable);
+                            isListAvailable=false;
                             //EXCLUSIVE LOCK ACQUIRED
+                                chatListx.add(msgobj);
+                            //EXCLUSIVE LOCK RELEASED
                             isListAvailable=true;
                             ChatActivity.flag=0;// TO ALLOW THE RECYCLER VIEW TO SCROLL TO THE END
                     callingInterface();
@@ -134,7 +128,7 @@ public class Repository implements ChatActivity.onBackPressListener {
         isListAvailable=false;
 //        //EXCLUSIVE LOCK ACQUIRED
 //        for(int i=chatListx.size()-1;i>=0;i--) {
-//            Log.d(TAG,"On calling interface ^^-^-^-^-^-^^^^^^^^^^^^^^"+chatListx.get(i).getMessage()+" || i->"+i+" ||cnt-> "+cnt++);
+            Log.d(TAG,"On calling interface ^^-^-^-^-^-^^^^^^^^^^^^^^"+chatListx.size()+" || cnt "+cnt++);
 //        }
 //        Log.d(TAG,"Inteface to ViewModel called ");
         onFirestoreTaskCompleteRef.TaskDataLoaded(chatListx);
@@ -145,9 +139,9 @@ public class Repository implements ChatActivity.onBackPressListener {
 
     @Override
     public void onBackPressByUser() {
-        if(asyncTask!=null)
+        if(asyncTask!=null && asyncTask.getStatus() == AsyncTask.Status.RUNNING )
         {
-//            Log.d("OnCancel"," chatList size => "+chatListx.size());
+            Log.d("OnCancel"," CANCELLING )()()()()()()()()()()( chatList size => "+chatListx.size());
             asyncTask.cancel(true);
 //            chatListx.clear();
         }
@@ -157,10 +151,7 @@ public class Repository implements ChatActivity.onBackPressListener {
 
     public  class DbAsyncTask extends AsyncTask<DataSnapshot,Void,ArrayList<Message>>
     {
-//        Repository reference;
-//        DatabaseReference mDbRef;
-//        ArrayList<Message> chatlistOfAsyncTask;
-//        String room;
+
         private DbAsyncTask(){ Log.d("tag"," DbAsyncTask Initializing  and its id -> "+Thread.currentThread().getId());}
 
         @Override
@@ -173,15 +164,32 @@ public class Repository implements ChatActivity.onBackPressListener {
             ArrayList<Message> chatlistBg = new ArrayList<>();
 
             ArrayList<Message> unDecList = new ArrayList<>();
+
+
             for(DataSnapshot snap:snapshots[0].getChildren()) {
                 Message msgobj = snap.getValue(Message.class);
                 unDecList.add(msgobj);
             }
-
+//            for(int i=0;i<unDecList.size();i++)
+//            {
+//                Message msgobj=unDecList.get(i);
+//                if(msgobj.chatDay!=null && !msgobj.chatDay.equals("") && i==0)
+//                {
+////                    Log.d("array","i xxx>"+i+"    val--->"+msgobj.firstChat);
+//                    msgobj.firstChat="1";
+//                }
+//                else if(msgobj.chatDay!=null && i!=0){
+//                    Message msg=unDecList.get(i-1);
+//                    if(msg.chatDay!=null &&  !msg.chatDay.equals(msgobj.chatDay) || msg.chatDay==null)
+//                        msgobj.firstChat="1";
+//
+//                }
+//                Log.d("array","i --->"+i+"    val--->"+msgobj.firstChat);
+//            }
 
             int iniLoadAmount=20;   //LOADING RECENT 10 MESSAGES   ( initial load amount )
             int unDecMessageSize=unDecList.size();
-            int count=unDecMessageSize;
+//            int count=unDecMessageSize;
             while(unDecMessageSize>0)
             {
                 int initial=unDecMessageSize-iniLoadAmount;
@@ -197,18 +205,12 @@ public class Repository implements ChatActivity.onBackPressListener {
                     String msgx = "";
                     if (msgobj.publickey.equals("1")) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            try {
-                                msgx = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
-                            }
-                            catch (Exception e){
-                                msgx="NULL MESSAGE";
-                                msgobj.publickey="0";
-                            }
-                          msgobj.setMessage(msgx);
+                            msgx = RsaEncryptionHandler.decryptMessage(msgobj.getMessage());
+                            msgobj.setMessage(msgx);
                         }
                     }
                     chatlistBg.add(msgobj);
-                    count--;
+//                    count--;
 //                    Log.d(TAG," (inthe loop in doinBack) chatlist Size -> "+chatlistBg.size());
 //                    Log.d(TAG," (inthe loop in doinBack) remaining unencrypted -> "+count);
                 }

@@ -82,6 +82,7 @@ public class ChatActivity extends AppCompatActivity {
     public static  onBackPressListener ref=null;
     private APIService apiService;
     public String recieverPublicKey="";
+//    String msg = "";
     public static int flag=0; //ALLOWS TO SCROLL RECYCLER VIEW TO LAST POSITION ONLY RECEIVER REPLIES OR USER ENDS NEW MESSAGES
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +126,6 @@ public class ChatActivity extends AppCompatActivity {
         rview.setLayoutManager(llm);
         chatList = new ArrayList<Message>();
         Log.d("bug","here1");
-
         msgAdapter=new ChatAdapter(this);
 //        msgAdapter.submitList(chatList);
 //        msgAdapter = new MessageAdapter(this,chatList);
@@ -150,9 +150,10 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Message> messageList) {
 //                Toast.makeText(ChatActivity.this, "on chatActivity", Toast.LENGTH_SHORT).show();
-//                Log.d("tag",messageList.size()+" observed list size");
+//                Log.d("Repository",messageList.size()+" observed list size");
 //                maxMsgId=Integer.MAX_VALUE;
-//                Log.d("OnCancel","messageList.Size ->"+messageList.size()+"    adaptersize"+msgAdapter.getItemCount());
+//                card.insertLayout(messageList.size());
+//                Log.d("Repository","messageList.Size ->"+messageList.size()+"    adaptersize"+msgAdapter.getItemCount());
                 if (messageList.size()>msgAdapter.getItemCount()) {
                     chatList = new ArrayList<>(messageList);
 //                    for (int i = 0; i < chatList.size(); i++) {
@@ -191,7 +192,6 @@ public class ChatActivity extends AppCompatActivity {
 //            @Override
 //            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
 //                return false;
-//            }
 //
 //            @Override
 //            public RecyclerView.ViewHolder chooseDropTarget(@NonNull RecyclerView.ViewHolder selected, @NonNull List<RecyclerView.ViewHolder> dropTargets, int curX, int curY) {
@@ -205,97 +205,119 @@ public class ChatActivity extends AppCompatActivity {
 //        }).attachToRecyclerView(rview);
         //**********************************************************
 
-        //******************* Updating Chatroom ********************
+        //****************** Getting thus application build date***********
+        String startingdate="2023-05-01";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");    //sdf is SimpleDateFormat Object
+        Date date = null;
+        try {date = sdf.parse(startingdate);}                                //date from string to --> Date Format}
+        catch (Exception e)
+        { e.printStackTrace();}
+        long starttime = date.getTime();                                     //total time till this date from 01/01/1970 [in ms].
+        //*****************************************************************
+        //******************* Updating Chatroom ***************************
           imgv.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View view) {
+
 //                  Log.d("bug","here2");
 //                  InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 //                  imm.hideSoftInputFromWindow(relativeLayout.getWindowToken(), 0);
                   String msg = edtx.getText().toString();
+                                              //temp
+//                  new Thread(new Runnable() {             //temp
+//                      @Override                           //temp
+//                      public void run() {                 //temp
+//                          int cntr=1001;
+//                      for(int i=0;i<1000;i++) {
+
+//                          msg = "" + (++cntr);
                   if(msg.equals(""))
                     return;
                   flag=0;
 
-                  Calendar c = Calendar.getInstance();
-                  int hr =c.get(Calendar.HOUR_OF_DAY);
-                  int min=c.get(Calendar.MINUTE);
-                  String sendingtime= hr+":"+min+"";
+                          Calendar c = Calendar.getInstance();
+                          int hr = c.get(Calendar.HOUR_OF_DAY);
+                          int min = c.get(Calendar.MINUTE);
+                          String sendingtime = hr + ":" + min + "";
+                          long crnttime = System.currentTimeMillis();
+                          Date currentDate = new Date(crnttime);
+                          crnttime = crnttime - starttime;
 
-                  String startingdate="2023-05-01";
+                          //CONVERTING CURRENT DATE TO STRING FORMAT
+                          SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");    //sdf is SimpleDateFormat Object
+                          String stringCurrDate = sdf2.format(currentDate);
+                          String id = "" + crnttime;
+//                  Toast.makeText(ChatActivity.this, stringCurrDate, Toast.LENGTH_SHORT).show();
 
-                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");    //sdf is SimpleDateFormat Object
-                  Date date = null;
 
-                  try {date = sdf.parse(startingdate);}                                //date from string to --> Date Format}
-                  catch (Exception e)
-                  { e.printStackTrace();}
+                          Message msgObject = new Message(msg, Senderid, sendingtime, id);
+                          msgObject.chatDay = stringCurrDate;
+                          if (UserPreferences.getInstance(ChatActivity.this).isEncryptionEnabled()) {//WHEN ENCRYPTION IS ON
+                              if (recieverPublicKey == null) {
+                                  Toast.makeText(ChatActivity.this, "Cannot encrypt as reciever is not updated", Toast.LENGTH_LONG).show();
+                                  return;
+                              }
+                              Handler handler = new Handler(getMainLooper());
+                              handler.post(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      Message msgObject2 = new Message(msg, Senderid, sendingtime, id); //This will be stored in SenderRoom
 
-                  long starttime = date.getTime();                                     //total time till this date from 01/01/1970 [in ms].
-                  long crnttime = System.currentTimeMillis();
-                  crnttime= crnttime-starttime ;
+                                      String m = msg;
+                                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                          //for reciever
+                                          m = RsaEncryptionHandler.encryptMessageForReciever(msg, recieverPublicKey);
+                                          if (m == null) {
+                                              Toast.makeText(ChatActivity.this, "Too BIG to ENCRYPT", Toast.LENGTH_SHORT).show();
+                                              return;
+                                          }
+                                          msgObject.setMessage(m);
+                                          msgObject.setPublickey("1");
+                                          msgObject.chatDay = stringCurrDate;
 
-                  String id= ""+crnttime;
-               Message msgObject = new Message(msg,Senderid,sendingtime,id);
+                                          //for  sender
+                                          m = RsaEncryptionHandler.encryptMessageForSender(msg);
+                                          msgObject2.setMessage(m);
+                                          msgObject2.setPublickey("1");
+                                          msgObject2.chatDay = stringCurrDate;
 
-               if(UserPreferences.getInstance(ChatActivity.this).isEncryptionEnabled()) {//WHEN ENCRYPTION IS ON
-                   if(recieverPublicKey==null) {
-                       Toast.makeText(ChatActivity.this, "Cannot encrypt as reciever is not updated", Toast.LENGTH_LONG).show();
-                       return;
-                   }
-                   Handler handler= new Handler(getMainLooper());
-                   handler.post(new Runnable() {
-                       @Override
-                       public void run() {
-                           Message msgObject2 = new Message(msg,Senderid,sendingtime,id); //This will be stored in SenderRoom
+                                      }
+                                      edtx.setText("");
+                                      mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject2).
+                                              addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                  @Override
+                                                  public void onSuccess(Void unused) {
+                                                      Log.d("bug", "here3");
+                                                      mDbRef.child("chats").child(recieverroom).child("messages").push().setValue(msgObject);
+                                                  }
+                                              });
+                                  }
+                              });
 
-                           String m=msg;
-                           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                               //for reciever
-                               m=RsaEncryptionHandler.encryptMessageForReciever(msg,recieverPublicKey);
-                               if(m==null)
-                               {
-                                   Toast.makeText(ChatActivity.this, "Too BIG to ENCRYPT", Toast.LENGTH_SHORT).show();
-                                   return ;
-                               }
-                               msgObject.setMessage(m);
-                               msgObject.setPublickey("1");
-
-                               //for  sender
-                               m=RsaEncryptionHandler.encryptMessageForSender(msg);
-                               msgObject2.setMessage(m);
-                               msgObject2.setPublickey("1");
-                           }
-                           edtx.setText("");
-                           mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject2).
-                                   addOnSuccessListener(new OnSuccessListener<Void>() {
-                                       @Override
-                                       public void onSuccess(Void unused) {
-                                           Log.d("bug", "here3");
-                                           mDbRef.child("chats").child(recieverroom).child("messages").push().setValue(msgObject);
-                                       }
-                                   });
-                       }
-                   });
-
-               }
-               else { // WHEN ENCRYPTION IS OFF
-                   new Thread(new Runnable() {
-                       @Override
-                       public void run() {
-                           mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject).
-                                   addOnSuccessListener(new OnSuccessListener<Void>() {
-                                       @Override
-                                       public void onSuccess(Void unused) {
-                                           Log.d("bug", "here3");
-                                           mDbRef.child("chats").child(recieverroom).child("messages").push().setValue(msgObject);
-                                       }
-                                   });
-                       }
-                   }).start();
-                   edtx.setText("");
-               }
-
+                          } else { // WHEN ENCRYPTION IS OFF
+                              new Thread(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      mDbRef.child("chats").child(senderroom).child("messages").push().setValue(msgObject).
+                                              addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                  @Override
+                                                  public void onSuccess(Void unused) {
+                                                      Log.d("bug", "here3");
+                                                      mDbRef.child("chats").child(recieverroom).child("messages").push().setValue(msgObject);
+                                                  }
+                                              });
+                                  }
+                              }).start();
+                              edtx.setText("");
+                          }
+//                          try {
+//                              Thread.sleep(1000);
+//                          } catch (InterruptedException e) {
+//                              e.printStackTrace();
+//                          }
+//                      }
+//                      }                     //temp
+//                  }).start();               //temp
                //***************  Sending the Notification ******************************************
                new Thread(new Runnable() {
                    @Override
@@ -315,10 +337,7 @@ public class ChatActivity extends AppCompatActivity {
                //*************XXXXXX Sending Notifiacation XXXXXX************************************
               }
           });
-
-
-        //****************************************************************
-
+        //*****************************************************************
     }
     public void ScrollingToEnd()
     {

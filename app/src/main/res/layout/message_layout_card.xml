@@ -2,6 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/llDay"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content">
+    </LinearLayout>
     <TextView
         android:id="@+id/txtrecieve"
         android:layout_width="wrap_content"
@@ -15,6 +23,7 @@
         android:paddingVertical="18dp"
         android:paddingLeft="22dp"
         android:paddingRight="15dp"
+        android:layout_below="@+id/llDay"
         android:background="@drawable/bg_reciever"
         android:textColor="@color/white"
         android:layout_alignParentLeft="true">

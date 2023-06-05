@@ -6,7 +6,8 @@ public class Message {
    private String message;
    private String senderId;
    public String id="";
-   public String date="";
+   public String chatDay="";
+   public String date="";      //actually the time
    public String publickey=""; // means the data is encrypted
 
     public Message(String message, String senderId,String date,String id) {

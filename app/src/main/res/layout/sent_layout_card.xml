@@ -2,6 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/llDay"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content">
+    </LinearLayout>
     <TextView
         android:id="@+id/txtsent"
         android:layout_marginRight="5dp"
@@ -13,6 +21,7 @@
         android:fontFamily="@font/quicksand_medium"
         android:textStyle="bold"
         android:paddingVertical="18dp"
+        android:layout_below="@+id/llDay"
         android:paddingRight="15dp"
         android:paddingLeft="22dp"
         android:background="@drawable/bg_sender"

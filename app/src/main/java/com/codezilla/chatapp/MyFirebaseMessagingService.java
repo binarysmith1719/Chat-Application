@@ -29,7 +29,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String messagex = message.getData().get("Message");
 
         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-        PendingIntent pendingIntent= PendingIntent.getActivity(this,0,intent,0);
+        PendingIntent pendingIntent= PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_IMMUTABLE);
         if(!UserActive.isActive || (UserActive.isActive&&(!title.equals(UserActive.chattingWith))) ) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "0")
                     .setSmallIcon(R.drawable.ic_baseline_notifications_24)
