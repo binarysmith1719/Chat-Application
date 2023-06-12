@@ -11,6 +11,9 @@ public class AppUser {
         this.email=email;
         this.uid=uid;
     }
+    public boolean equals(AppUser obj) {
+        return this.uid.equals(obj.uid);
+    }
 //    public AppUser(String name,String email)
 //    {
 //        this.name=name;

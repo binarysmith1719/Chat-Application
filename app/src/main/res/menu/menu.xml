@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-           <item
-               android:id="@+id/logout"
-               android:title="Log Out">
-           </item>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/mypic"
+        android:icon="@drawable/ic_baseline_edit_24"
+        app:showAsAction="ifRoom"
+        android:title="Profile Picture">
+    </item>
            <item
                android:id="@+id/addUser"
                android:title="Add Friend">
@@ -12,4 +15,8 @@
                android:id="@+id/myid"
                android:title="My Userid">
            </item>
+    <item
+        android:id="@+id/logout"
+        android:title="Log Out">
+    </item>
 </menu>

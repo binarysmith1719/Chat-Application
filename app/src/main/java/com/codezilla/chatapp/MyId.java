@@ -25,7 +25,7 @@ public class MyId extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_id);
-        getSupportActionBar().setTitle("MY ID");
+//        getSupportActionBar().setTitle("MY ID");
 
         textView =findViewById(R.id.Txt_urid);
         txtv = findViewById(R.id.Txttest);

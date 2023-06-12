@@ -43,7 +43,7 @@ private String MAIN_KEY="main key";
             startActivity(intent);
         }
 
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         signupbutton= findViewById(R.id.btn_signup);
         loginbutton= findViewById(R.id.btn_login);

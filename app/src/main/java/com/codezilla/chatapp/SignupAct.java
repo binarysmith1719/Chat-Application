@@ -38,7 +38,7 @@ public class SignupAct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         signupbutton= findViewById(R.id.btn_signup);
         editTextEmail=findViewById(R.id.edt_eml2);

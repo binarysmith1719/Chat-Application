@@ -30,7 +30,7 @@ public class AddUser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user);
-        getSupportActionBar().setTitle("ADD FRIEND");
+//        getSupportActionBar().setTitle("ADD FRIEND");
 
         btn= findViewById(R.id.btnlst);
         edtx =findViewById(R.id.edtxlst);

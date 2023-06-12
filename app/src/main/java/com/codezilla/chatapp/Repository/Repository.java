@@ -199,6 +199,11 @@ public class Repository implements ChatActivity.onBackPressListener {
 
                 for(int i=initial;i<unDecMessageSize;i++)
                 {
+                    if(ChatActivity.backPressed){
+                        this.cancel(true);
+                        return chatlistBg;
+                    }
+
 
 //                    Log.d(TAG," for loop i (val) -> "+i);
                     Message msgobj = unDecList.get(i);

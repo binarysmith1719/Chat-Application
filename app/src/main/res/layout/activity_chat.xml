@@ -7,13 +7,56 @@
     tools:context=".ChatActivity"
     android:id="@+id/mainLayout"
     android:background="@color/blackarsenic">
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/actionbar"
+        android:background="@color/purple_200"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize">
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:backgroundTint="@color/white"
+                app:cardCornerRadius="24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="7dp"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/profCard"
+                android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:id="@+id/profilePic"
+                android:src="@drawable/userabc">
+            </ImageView>
+            </androidx.cardview.widget.CardView>
+            <TextView
+            android:layout_width="170dp"
+            android:id="@+id/name"
+                android:layout_toRightOf="@+id/profCard"
+                android:text="Friend name"
+                android:paddingBottom="3dp"
+                android:textSize="20dp"
+                android:singleLine="true"
+                android:fontFamily="@font/quicksand_bold"
+                android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content">
+            </TextView>
+        </RelativeLayout>
+
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvchat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/llayt"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/actionbar"
         android:scrollbars="vertical"
         android:background="@color/blackarsenic"
         android:backgroundTint="@color/blackarsenic">
@@ -33,12 +76,21 @@
             android:layout_centerVertical="true"
             android:layout_marginHorizontal="9dp"
             android:layout_marginTop="20dp"
-            android:layout_toLeftOf="@+id/img_send"
+            android:layout_toLeftOf="@+id/img_shr"
             android:background="@drawable/bg_write_msg"
             android:fontFamily="@font/quicksand_medium"
             android:hint="Type Here"
             android:padding="18dp"
             android:textColor="@color/white"></EditText>
+        <ImageView
+            android:id="@+id/img_shr"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="20"
+            android:layout_marginRight="9dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/img_send"
+            android:src="@drawable/newimage2"></ImageView>
 
         <ImageView
             android:id="@+id/img_send"
@@ -51,6 +103,22 @@
             android:src="@drawable/share"></ImageView>
 
     </RelativeLayout>
-
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="9dp"
+        android:max="100"
+        android:visibility="invisible"
+        android:id="@+id/pgbr"
+        android:min="0"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_alignTop="@+id/llayt">
+    </ProgressBar>
+    <ProgressBar
+        android:id="@+id/pgbrChat"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
+    </ProgressBar>
 
 </RelativeLayout>

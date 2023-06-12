@@ -1,9 +1,8 @@
 package com.codezilla.chatapp;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Build;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,29 +14,35 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.codezilla.chatapp.RsaEncryption.MyKeyPair;
-import com.codezilla.chatapp.RsaEncryption.RsaAlgo;
-import com.codezilla.chatapp.RsaEncryption.RsaEncryptionHandler;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.zip.Inflater;
 
 public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
     Integer SENT = 2;
     Integer RECIEVE = 1;
     TextToSpeech tts;
+    String senderRoom;
     int textToSpeech_RESULT;
     private Context context;
     LayoutInflater inflator;
 //    View card;
 //    TextView tvDay;
-    public ChatAdapter(Context context) {
+    public ChatAdapter(Context context,String senderRoom) {
 //        super();
         super(DIFF_CALLBACK);
         this.context = context;
@@ -50,6 +55,7 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
                 }
             }
         });
+        this.senderRoom=senderRoom;
     }
     private static final DiffUtil.ItemCallback<Message> DIFF_CALLBACK = new DiffUtil.ItemCallback<Message>() {
         @Override
@@ -141,6 +147,78 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
                 ((SendViewHolder) holder).llc.addView(card, ((SendViewHolder) holder).llc.getChildCount());
             }
 
+            if(currentMessage.imageURL!=null && !currentMessage.imageURL.equals("")){
+//                ((SendViewHolder) holder).isEncrypted.setText(isEncrypted+" i");
+
+//                File imgFilePath=new File(senderRoom+"/"+currentMessage.id+".jpg");
+                    ((SendViewHolder)holder).imgShrd.getLayoutParams().height=850;
+                    ((SendViewHolder)holder).imgShrd.getLayoutParams().width=850;
+//                    if(imgFilePath.exists()){
+//                        Log.d("images","uri of "+position+" path is"+imgFilePath);
+//                     Uri uri=Uri.fromFile(imgFilePath);
+//                        if(uri==null)
+//                            Log.d("images","NULL URI");
+//                        else
+//                            Log.d("images","NOT NULL URI");
+
+//                    ((SendViewHolder) holder).imgShrd.setImageURI  Log.d("SBS","MAP ---> to ImageView");
+                Log.d("SBS","MAP ---> to ImageView");
+                if(ChatActivity.map.containsKey(currentMessage.id)) {
+                    ((SendViewHolder) holder).imgShrd.setImageBitmap((Bitmap) ChatActivity.map.get(currentMessage.id));
+//                Log.d("images","BEFORE CHECKING DRAWABLE "+((SendViewHolder) holder).imgShrd.getDrawable());
+                }else{
+                    Log.d("images","USING PICASSO");
+                    Log.d("SBS","USING PICASSO");
+                    try {
+                        Glide.with(context).load(currentMessage.imageURL).listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                                Toast.makeText(context, "resouce in the image", Toast.LENGTH_SHORT).show();
+                                ((SendViewHolder) holder).imgShrd.setImageResource(R.drawable.removed);
+//                                ((SendViewHolder) holder).imgShrd.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.removed));
+                                return true;
+                            }
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {return false;}
+                        }).into(((SendViewHolder) holder).imgShrd);
+                    }catch (ClassCastException e) {((SendViewHolder) holder).imgShrd.setImageResource(R.drawable.removed);}
+//                         Picasso.get().load(currentMessage.imageURL).into(((SendViewHolder) holder).imgShrd, new Callback() {
+//                        @Override
+//                        public void onSuccess() {
+//                            Toast.makeText(context, "image found", Toast.LENGTH_SHORT).show();
+//                        }
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Toast.makeText(context, "image not found", Toast.LENGTH_SHORT).show();
+//                        }
+//                        });
+//                    }
+                }
+//                Log.d("images","uri of "+position+"   IMAGE SETTING");
+//
+////                        Bitmap bitmap= BitmapFactory.decodeFile(imgFilePath.getAbsolutePath());
+////                        ((SendViewHolder) holder).imgShrd.setImageBitmap(bitmap);
+//
+//                     Handler handler= new Handler();
+//                     handler.post(new Runnable() {
+//                         @Override
+//                         public void run() {
+//                             Bitmap bitmap= BitmapFactory.decodeFile(imgFilePath.getAbsolutePath());
+//                             ((SendViewHolder) holder).imgShrd.setImageBitmap(bitmap);
+//                         }
+//                     });
+//
+//                    }
+//                    else{
+//                        Log.d("images","picasso and position-> "+position);
+
+//                    }
+            }
+            else if(currentMessage.imageURL==null ||currentMessage.imageURL.equals("") ){
+                ((SendViewHolder)holder).imgShrd.setImageDrawable(null);
+                ((SendViewHolder)holder).imgShrd.getLayoutParams().height=0;
+                ((SendViewHolder)holder).imgShrd.getLayoutParams().width=0;
+            }
 
 
         }
@@ -182,6 +260,85 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
                 tvDay.setText(currentMessage.chatDay);
                 ((RecieveViewHolder) holder).llc.addView(card,((RecieveViewHolder) holder).llc.getChildCount());
             }
+
+
+            if(currentMessage.imageURL!=null && !currentMessage.imageURL.equals("")){
+//                View imgView=inflator.inflate(R.layout.sharedimage,null);
+//                ImageView img=imgView.findViewById(R.id.imgShrd);
+//                tvDay.setText(currentMessage.chatDay);
+//                ((RecieveViewHolder) holder).cardImg.addView(imgView);
+//                ((SendViewHolder) holder).isEncrypted.setText(isEncrypted+" i");
+
+//                File imgFilePath=new File(senderRoom+"/"+currentMessage.id+".jpg");
+                ((RecieveViewHolder)holder).imgShrd.getLayoutParams().height=850;
+                ((RecieveViewHolder)holder).imgShrd.getLayoutParams().width=850;
+//                    if(imgFilePath.exists()){
+//                        Log.d("images","uri of "+position+" path is"+imgFilePath);
+//                     Uri uri=Uri.fromFile(imgFilePath);
+//                        if(uri==null)
+//                            Log.d("images","NULL URI");
+//                        else
+//                            Log.d("images","NOT NULL URI");
+
+//                    ((SendViewHolder) holder).imgShrd.setImageURI
+                Log.d("SBS","rec MAP ---> to ImageView");
+                if(ChatActivity.map.containsKey(currentMessage.id)) {
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {                       if()
+
+                            ((RecieveViewHolder) holder).imgShrd.setImageBitmap((Bitmap) ChatActivity.map.get(currentMessage.id));
+//                        }
+//                    }).start();
+//                img.setImageBitmap((Bitmap)ChatActivity.map.get(currentMessage.id));
+//                Log.d("images","BEFORE CHECKING DRAWABLE "+((RecieveViewHolder) holder).imgShrd.getDrawable());
+                }else{
+                    Log.d("images","USING PICASSO");
+                    Log.d("SBS","USING PICASSO");
+                    try {Glide.with(context).load(currentMessage.imageURL).listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                            Toast.makeText(context, "GLIDE: failed to load xxx", Toast.LENGTH_SHORT).show();
+                            ((RecieveViewHolder) holder).imgShrd.setImageResource(R.drawable.removed);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    }).into(((RecieveViewHolder) holder).imgShrd);
+                    }catch (ClassCastException e){
+                        ((RecieveViewHolder) holder).imgShrd.setImageResource(R.drawable.removed);
+                    }
+//                    Picasso.get().load(currentMessage.imageURL).into(((RecieveViewHolder) holder).imgShrd);
+                }
+//                Log.d("images","uri of "+position+"   IMAGE SETTING");
+//
+////                        Bitmap bitmap= BitmapFactory.decodeFile(imgFilePath.getAbsolutePath());
+////                        ((SendViewHolder) holder).imgShrd.setImageBitmap(bitmap);
+//
+//                     Handler handler= new Handler();
+//                     handler.post(new Runnable() {
+//                         @Override
+//                         public void run() {
+//                             Bitmap bitmap= BitmapFactory.decodeFile(imgFilePath.getAbsolutePath());
+//                             ((SendViewHolder) holder).imgShrd.setImageBitmap(bitmap);
+//                         }
+//                     });
+//
+//                    }
+//                    else{
+//                        Log.d("images","picasso and position-> "+position);
+
+//                    }
+            }
+            else if(currentMessage.imageURL==null ||currentMessage.imageURL.equals("") ){
+                ((RecieveViewHolder)holder).imgShrd.setImageDrawable(null);
+                ((RecieveViewHolder)holder).imgShrd.getLayoutParams().height=0;
+                ((RecieveViewHolder)holder).imgShrd.getLayoutParams().width=0;
+//                ((RecieveViewHolder) holder).cardImg.removeAllViews();
+            }
         }
     }
     public void speakvoice(String s)
@@ -209,7 +366,7 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
 
     class SendViewHolder extends RecyclerView.ViewHolder{
         public TextView TxtSent,Txttime,isEncrypted;
-        public ImageView voice;
+        public ImageView voice,imgShrd;
         public LinearLayout llc;
         public SendViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -219,12 +376,14 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
             Txttime=itemView.findViewById(R.id.timex);
             isEncrypted=itemView.findViewById(R.id.isEncrypted);
             llc=itemView.findViewById(R.id.llDay);
+            imgShrd=itemView.findViewById(R.id.imgShrd);
         }
     }
     class RecieveViewHolder extends RecyclerView.ViewHolder{
         public TextView TxtReciv,Txttime,isEncrypted;
-        public ImageView voice;
+        public ImageView voice,imgShrd;
         public LinearLayout llc;
+        public CardView cardImg;
         public RecieveViewHolder(@NonNull View itemView) {
             super(itemView);
 //            Log.d("bugg","Viewholder_recieve");
@@ -233,6 +392,8 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
             Txttime=itemView.findViewById(R.id.timex);
             isEncrypted=itemView.findViewById(R.id.isEncrypted);
             llc=itemView.findViewById(R.id.llDay);
+            imgShrd=itemView.findViewById(R.id.imgShrd);
+//            cardImg=itemView.findViewById(R.id.cardImg);
         }
     }
 }

@@ -10,15 +10,25 @@
     android:backgroundTint="@color/white"
     app:cardElevation="20dp"
     android:orientation="horizontal">
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:backgroundTint="@color/black"
+        app:cardCornerRadius="24dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginLeft="5dp"
+        android:layout_gravity="center_vertical"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:id="@+id/userPic"
+            android:src="@drawable/userabc"
+            >
 
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:paddingRight="7dp"
-        android:paddingLeft="5dp"
-        android:src="@drawable/userabc">
+        </ImageView>
+    </androidx.cardview.widget.CardView>
 
-    </ImageView>
 
     <TextView
         android:id="@+id/nametxt"

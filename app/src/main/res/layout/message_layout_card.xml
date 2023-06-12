@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/llDay"
@@ -10,59 +11,92 @@
         android:layout_alignParentTop="true"
         android:layout_height="wrap_content">
     </LinearLayout>
-    <TextView
-        android:id="@+id/txtrecieve"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/llDay"
         android:layout_marginLeft="5dp"
+        android:id="@+id/llCardHolder"
+        android:background="@drawable/bg_reciever"
         android:layout_marginRight="40dp"
         android:layout_marginTop="8dp"
-        android:text="Message recieved"
-        android:fontFamily="@font/quicksand_medium"
-        android:textStyle="bold"
-        android:paddingVertical="18dp"
-        android:paddingLeft="22dp"
-        android:paddingRight="15dp"
-        android:layout_below="@+id/llDay"
-        android:background="@drawable/bg_reciever"
-        android:textColor="@color/white"
-        android:layout_alignParentLeft="true">
-    </TextView>
-    <ImageView
-        android:layout_width="18dp"
-        android:src="@drawable/playbuttonparrot"
-        android:id="@+id/voice"
-        android:paddingLeft="5dp"
-        android:layout_alignTop="@+id/txtrecieve"
-        android:layout_alignBottom="@+id/txtrecieve"
-        android:layout_alignLeft="@+id/txtrecieve"
-        android:layout_height="20dp">
-    </ImageView>
-    <TextView
-        android:layout_width="wrap_content"
-        android:id="@+id/timex"
-        android:textStyle="normal"
-        android:text="20:33"
-        android:textSize="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="5dp"
-        android:textColor="@color/white"
-        android:layout_alignBottom="@+id/txtrecieve"
-        android:layout_alignRight="@+id/txtrecieve"
-        android:fontFamily="@font/quicksand_light"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:id="@+id/isEncrypted"
-        android:textStyle="bold"
-        android:text=""
-        android:textSize="11dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginBottom="5dp"
-        android:textColor="@color/white"
-        android:layout_alignBottom="@+id/txtrecieve"
-        android:layout_toLeftOf="@+id/timex"
-        android:fontFamily="@font/quicksand_bold"
-        android:layout_height="wrap_content"/>
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_gravity="left"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/txtrecieve"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Message recieved"
+                android:fontFamily="@font/quicksand_medium"
+                android:textStyle="bold"
+                android:paddingVertical="18dp"
+                android:paddingLeft="22dp"
+                android:paddingRight="15dp"
+                android:textColor="@color/white"
+                android:layout_alignParentLeft="true">
+            </TextView>
+            <ImageView
+                android:layout_width="18dp"
+                android:src="@drawable/playbuttonparrot"
+                android:id="@+id/voice"
+                android:paddingLeft="5dp"
+                android:layout_alignTop="@+id/txtrecieve"
+                android:layout_alignBottom="@+id/txtrecieve"
+                android:layout_alignLeft="@+id/txtrecieve"
+                android:layout_height="20dp">
+            </ImageView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/timex"
+                android:textStyle="normal"
+                android:text="20:33"
+                android:textSize="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@color/white"
+                android:layout_alignBottom="@+id/txtrecieve"
+                android:layout_alignRight="@+id/txtrecieve"
+                android:fontFamily="@font/quicksand_light"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/isEncrypted"
+                android:textStyle="bold"
+                android:text=""
+                android:textSize="11dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@color/white"
+                android:layout_alignBottom="@+id/txtrecieve"
+                android:layout_toLeftOf="@+id/timex"
+                android:fontFamily="@font/quicksand_bold"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </LinearLayout>
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        app:cardCornerRadius="17dp"-->
+<!--        android:layout_alignLeft="@+id/llCardHolder"-->
+<!--        android:layout_below="@+id/llCardHolder"-->
+<!--        android:layout_marginTop="1dp"-->
+<!--        android:id="@+id/cardImg"-->
+<!--        android:layout_height="wrap_content">-->
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="5dp"
+            android:layout_marginRight="40dp"
+            android:layout_alignLeft="@+id/llCardHolder"
+            android:layout_below="@+id/llCardHolder"
+            android:layout_marginTop="1dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_reciever"
+            android:id="@+id/imgShrd">
+        </ImageView>
+<!--    </androidx.cardview.widget.CardView>-->
 
 </RelativeLayout>
