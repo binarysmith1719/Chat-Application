@@ -18,6 +18,37 @@ FEATURES :
 - Add and remove friends
 
 SCREENSHOTS :
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <img src=https://github.com/binarysmith1719/Chat-Application/assets/97899226/b0e8a787-b9c4-483b-9b37-e535b984f128 width="400">
 <img src=https://github.com/binarysmith1719/Chat-Application/assets/97899226/ee31bccc-7f0f-4c9e-91ba-33cff9b7d29d width="400">
 <img src=https://github.com/binarysmith1719/Chat-Application/assets/97899226/151469d0-d20c-468f-8585-807a46afed88 width="400">
