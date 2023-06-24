@@ -4,7 +4,7 @@ USED :
 - Firebase ( Authentication, Realtime Database, Storage ) 
 - MVVM Architecture
 - Firebase Cloud Messaging with Retrofit ( For Notification )
-- RSA Encryption using Cipher
+- RSA Encryption using Cipher/KeyStore/KeyPairGenerator
 - Glide library
 
 FEATURES :
