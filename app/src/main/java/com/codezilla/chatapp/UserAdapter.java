@@ -95,56 +95,7 @@ public class UserAdapter extends ListAdapter<AppUser,UserAdapter.ViewHolder> {
         }else {
             holder.imgView.setImageBitmap(removed);
         }
-//            mDbRef.child("ProfilePic").child(user.getUid()).addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    String userId=snapshot.getKey();
-////                    if(userId!=user.uid)
-////                        return;
-//                    Log.d("Adap","user who called this ------>"+userId);
-//                    Log.d("Adap","user holding the holder---->"+user.getUid()+"     name--->"+user.name);
-//
-//                    String picURL = snapshot.getValue(String.class);
-//                    if (picURL == null || picURL.equals("")) //PIC NOT AVAILABLE
-//                    {
-//                        holder.imgView.setImageBitmap(removed);
-//                        return;
-//                    }
-//                    Log.d("Adap","using glide by user-------->"+user.getUid()+"     name--->"+user.name);
-//                    Glide.with(context).load(picURL).into(holder.imgView);
-//                }
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {}
-//            });
-//        }
     }
-//
-//    @Override
-//    public void onBindViewHolder(@NonNull UserAdapter.ViewHolder holder, int position) {
-////        Log.d("bug","got_response4");
-////      AppUser user = userList.get(position);
-////        holder.nametxt.setText(user.getName().toUpperCase());
-////        holder.itemView.setOnClickListener(new View.OnClickListener() {
-////            @Override
-////            public void onClick(View view) {
-////                UserActive.chattingWith=user.getName();
-////                Intent intent = new Intent(context,ChatActivity.class);
-////                intent.putExtra("NAME_KEY",user.getName());
-////                intent.putExtra("UID_KEY", user.getUid());
-////                intent.putExtra("NODEKEY",user.NodeKeyForDeletion);
-////                context.startActivity(intent);
-////            }
-////        });
-////        if(ProfilePictureOperations.picMap.containsKey(user.getUid())){
-////        holder.imgView.setImageBitmap((Bitmap) ProfilePictureOperations.picMap.get(user.getUid()));
-////        }else
-////            holder.imgView.setImageResource(R.drawable.userabc);
-//    }
-
-//    @Override
-//    public int getItemCount() {
-////        return userList.size();
-//    }
 
     public class ViewHolder extends RecyclerView.ViewHolder  {
         private TextView nametxt ;

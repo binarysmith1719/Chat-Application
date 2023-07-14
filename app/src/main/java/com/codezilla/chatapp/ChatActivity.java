@@ -2,15 +2,19 @@ package com.codezilla.chatapp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -18,6 +22,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +35,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -104,11 +110,13 @@ import retrofit2.Response;
 public class ChatActivity extends AppCompatActivity  implements ImageCompressionCompletionListener {
     private static final String TAG2 = "BIG_BUG";
     private static final String TAG = "ChatActivity";
+    public final int CAMERA_REQUEST_CODE=101;
+    public final String CAPTURED_IMAGE_FILENAME="cameraImg.jpg";
     private Toolbar tlbr;
     private RelativeLayout relativeLayout;
     private RecyclerView rview;
     private EditText edtx;
-    private ImageView imgv,imgShr;
+    private ImageView imgv,imgShr,camera;
     public  ProgressBar pgbr;
     public  ProgressBar pgbrChat;
     private ChatAdapter msgAdapter;
@@ -126,6 +134,7 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
     public StorageReference mStoreRef;
     Uri imageUri;
     String imageUrl;
+    File captureFile;          //FILE TO STORE THE CAPTURED IMAGE
     StorageTask mStoragetask;  //USED TO KEEP CHECK ON A UPLOADING TASK. CHECKS IF AN UPLOADING TASK IS COMPLETE OR NOT
     public Boolean selectedImage=false; //CHECKS IF IMAGE HAS BEEN SELECTED
     //----------------------------------------------------->>
@@ -188,9 +197,14 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
         recieverroom = Recieverid + Senderid;
         //INITIALIZING IMAGE TO STORAGE CLASS
         StoreImgRef = new StoreImagesToStorage(this,senderroom);
+        //INITIALIZING KEYPAIR
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            iniKeyPair();
+        }
 
         relativeLayout=findViewById(R.id.mainLayout);
         edtx= findViewById(R.id.edt_write);
+        camera=findViewById(R.id.camera);
         pgbr=findViewById(R.id.pgbr);
         pgbrChat=findViewById(R.id.pgbrChat);
         pgbrChat.setVisibility(View.VISIBLE);
@@ -204,35 +218,23 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
         chatList = new ArrayList<Message>();
         Log.d("bug","here1");
         msgAdapter=new ChatAdapter(this,getExternalFilesDir(null)+"/"+senderroom);
-//        msgAdapter.submitList(chatList);
-//        msgAdapter = new MessageAdapter(this,chatList);
         rview.setAdapter(msgAdapter);
-//        rview.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                Toast.makeText(ChatActivity.this, "Touched the recyclerview"+(count), Toast.LENGTH_SHORT).show();
-//                count++;
-//                return true;
-//            }
-//        });
 
+        //****************** File for storing Camera image *********
+        captureFile=new File(getExternalFilesDir(null),CAPTURED_IMAGE_FILENAME);
+        //**********************************************************
+
+
+        Log.d("SBS","called ONCREATE");
         //****************** Populating RecyclerView ***************
         taskViewModel= new ViewModelProvider(this).get(TaskViewModel.class);      //NO NEW OBJECT FOR VIEWMODEL IS CREATED WHEN LIFECYCLE CHANGES
         taskViewModel.probeRepository(senderroom);
         taskViewModel.messageData.observe(this, new Observer<List<Message>>() {
             @Override
             public void onChanged(List<Message> messageList) {
-//                Toast.makeText(ChatActivity.this, "on chatActivity", Toast.LENGTH_SHORT).show();
-//                Log.d("Repository",messageList.size()+" observed list size");
-//                maxMsgId=Integer.MAX_VALUE;
-//                card.insertLayout(messageList.size());
-//                Log.d("Repository","messageList.Size ->"+messageList.size()+"    adaptersize"+msgAdapter.getItemCount());
                 if (messageList.size()>msgAdapter.getItemCount()) {
                     chatList = new ArrayList<>(messageList);
                     storingImages(chatList);
-//                    for (int i = 0; i < chatList.size(); i++) {
-//                        Log.d(TAG, "chatList[" + i + "] = " + chatList.get(i));
-//                    }
                     msgAdapter.submitList(chatList, new Runnable() {   //THIS CALLBACK IS CALLED WHEN THE
                         @Override
                         public void run() {
@@ -242,10 +244,6 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
                             }
                         }
                     });
-//                    if (flag == 0) {
-//                        rview.scrollToPosition(msgAdapter.getItemCount());
-////                    flag=1;
-//                    }
                 }
                 pgbrChat.setVisibility(View.INVISIBLE);
             }
@@ -306,8 +304,9 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
 //                      for(int i=0;i<1000;i++) {
 
 //                          msg = "" + (++cntr);
-                  if(msg.equals(""))
-                    return;
+                  if(msg.equals("")){
+                      Toast.makeText(ChatActivity.this, "Type the message", Toast.LENGTH_SHORT).show();
+                      return;}
                   flag=0;
 
                           Calendar c = Calendar.getInstance();
@@ -433,10 +432,11 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
                 if(mStoragetask!=null &&  mStoragetask.isInProgress() || selectedImage==true){
 //                    Toast.makeText(ChatActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
                 }
-                else{
+                else {
 //                    Toast.makeText(ChatActivity.this, "open file chooser", Toast.LENGTH_SHORT).show();
                     openFileChooser();
-                   }
+                }
+//                  onResume();
             }
         });
     }
@@ -568,17 +568,8 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
             ref.onBackPressByUser();// CANCELING THE BACKGROUND TASK
         }
     }
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        ChatActivity.map.clear();
-//
-//        if(ref != null){
-//            ref.onBackPressByUser();// CANCELING THE BACKGROUND TASK
-//        }
-//    }
 
-    //THIS LISTENER WILL STOP THE BACKGROUND WORK ON BACKPRESS
+    //THIS LISTENER WILL STOP THE BACKGROUND WORK ON BACK_PRESS
     public interface onBackPressListener{
         public void onBackPressByUser();
     }
@@ -606,23 +597,25 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-//            Toast.makeText(ChatActivity.this, "Got data", Toast.LENGTH_SHORT).show();
-//            try {
-//                Toast.makeText(this, "Img String", Toast.LENGTH_SHORT).show();
-//                Log.d("SBS","converting to string");
-//                InputStream is= getContentResolver().openInputStream(imageUri);
-//                Log.d("SBS","got stream");
-//                Bitmap btmp = BitmapFactory.decodeStream(is);
-//                Log.d("SBS","decoding stream for bitmap");
-//                String sImage=ByteToString(btmp);
-//                Log.d("SBS","sImage-->"+sImage);
-////                Toast.makeText(this, "Img String :"+sImage, Toast.LENGTH_SHORT).show();
-//            } catch (FileNotFoundException e) {
-////                e.printStackTrace();
-//                Toast.makeText(this, "Cannot put in inputstream", Toast.LENGTH_SHORT).show();
-//            }
-//            UploadFile();
-//            Picasso.get().load(imageUri).into(img);
+        }
+        else if(requestCode==CAMERA_REQUEST_CODE && resultCode==RESULT_OK && data!=null && data.getExtras()!=null) {
+            Bitmap bm = (Bitmap) data.getExtras().get("data");
+            try {
+//            imgShr.setImageBitmap(bm);
+                FileOutputStream fOutStream= new FileOutputStream(captureFile);
+                bm.compress(Bitmap.CompressFormat.PNG,100,fOutStream);
+                fOutStream.close();
+                pgbr.setVisibility(View.VISIBLE);
+                pgbr.setProgress(5);
+                imageUri=Uri.fromFile(captureFile);
+                UploadFile();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//
+//
         }
     }
     public String getFileExtension(Uri uri)
@@ -636,77 +629,24 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
     private void UploadFile() {
         if(imageUri!=null)
         {
-//            imageUri.toString();
-//            String string=imageUri.toString();
-//            Log.d("ImageCompression",""+string);
-//
-//            File file = new File(imageUri.getPath());//create path from uri
-//            File filex=new File(getExternalFilesDir(null),"compressed.jpg");
-//            try {
-//                InputStream is= getContentResolver().openInputStream(imageUri);
-////                Log.d("SBS","storing new image");
-//                Bitmap bitmap = BitmapFactory.decodeStream(is);
-////                ChatActivity.map.put(fname,bitmap);
-////                Log.d("SBS","inserted new image in the MAP");
-////            ChatActivity.isStoringImage=true;//--------------------------------
-//                FileOutputStream outputStream=null;
-//                try {outputStream=new FileOutputStream(filex);
-//                } catch (FileNotFoundException e) {}
-//                Log.d("images","File Stream Created");
-////                Bitmap bitmap2=BitmapFactory.decodeStream((InputStream) new URL(Url).getContent());
-////            Log.d("imagesx","bitmap Created Created");
-////                ChatActivity.map.put(fname,bitmap);
-//                bitmap.compress(Bitmap.CompressFormat.JPEG,20,outputStream);
-////            Log.d("imagesx","bitmap compressed");
-//                outputStream.flush();
-//                outputStream.close();
-////            ChatActivity.isStoringImage=false;//-------------------------------
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            final String[] split = file.getPath().split(":");//split the path.
-//            String path= split[1];
-//            Log.d("ImageCompression",""+path);
-//
-//            File file2 = new File(imageUri.getPath());//create path from uri
-//            Log.d("ImageCompression","+++++++++++++"+imageUri.getPath());
-////
-//            String x="/storage/emulated/0/Android/data/com.codezilla.chatapp/files/x3v6WXiQk5NdT4jvtSP6aEQdHMk1LkzORVcU1INqpQpyTPp9Kq1nO2k2/3259386947.jpg";
-////            Log.d("ImageCompression",""+getExternalFilesDir(null));
-//            String x2="image/12342";
-//            new ImageCompression(this,ChatActivity.this).execute(x2);
             StorageReference fileRef=mStoreRef.child(System.currentTimeMillis()+"."+getFileExtension(imageUri));
-//            Toast.makeText(ChatActivity.this, "image != null", Toast.LENGTH_SHORT).show();
             mStoragetask=fileRef.putFile(imageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                            Handler handler=new Handler();
-//                            handler.postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    pgbr.setProgress(0);
-//                                }
-//                            },500);
-                            Toast.makeText(ChatActivity.this, "Successfull", Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(ChatActivity.this, "IMAGE READY", Toast.LENGTH_SHORT).show();
                             pgbr.setVisibility(View.VISIBLE);
                             pgbr.setProgress(80);
                             fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
-//                                    Toast.makeText(ChatActivity.this, "image != null", Toast.LENGTH_SHORT).show();
-//                                    image img= new image(fname.getText().toString().trim(), uri.toString());
-//                                    mDbRef.push().setValue(img)
                                       imageUrl=uri.toString();
                                       selectedImage=false;
                                       pgbr.setProgress(100);
                                       pgbr.setVisibility(View.INVISIBLE);
                                 }
                             });
-
-//                            Toast.makeText(ChatActivity.this, "Upload Successful", Toast.LENGTH_SHORT).show();
-
-
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -769,30 +709,12 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
               //--------------------------------------------
           }
     }
-//    public String ByteToString(Bitmap bitmap){
-//        ByteArrayOutputStream baos= new ByteArrayOutputStream();
-////        Log.d("SBS","Byte Array Output Stream");
-//        bitmap.compress(Bitmap.CompressFormat.PNG,100,baos);
-////        Log.d("SBS","compressing ");
-//        byte[] b=baos.toByteArray();
-////        Log.d("SBS","Got Array");
-//        String temp= Base64.encodeToString(b,Base64.DEFAULT);
-////        Log.d("SBS","got string ----> "+temp);
-//        return temp;
-//    }
-
     public void storeOutgoingImg(String fid,Uri uri) {   //WORKS FASTER WHEN NOT USING THREAD
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-                try {
-//                    String fname=fid;
-//                    Uri imageURI=uri;
+                try { //RUNNING WITH PUTTING IN A NEW THREAD MAKES THE EXECUTION FASTER HERE
+
                     StoreImgRef.storeNewImage(fid,uri);
                 } catch (IOException e) {
                 }
-//            }
-//        }).start();
     }
 
     @Override
@@ -822,4 +744,70 @@ public class ChatActivity extends AppCompatActivity  implements ImageCompression
 //        super.onConfigurationChanged(newConfig);
 //        rview.scrollToPosition(msgAdapter.getItemCount()-1);
 //    }
+
+    //CAMERA WORK ------- ASKING PERMISSION --> OPENING CAMERA -------------------
+    public void askForCameraPermission(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},CAMERA_REQUEST_CODE);
+        else
+            openCamera();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==CAMERA_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is required to ACCESS camera", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    public void tryToCapture(View view){
+        askForCameraPermission();
+    }
+
+    void openCamera(){
+//        backPressed=true;
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(captureFile));
+//        intent.setAction();
+                startActivityForResult(intent,CAMERA_REQUEST_CODE);
+                onResume();
+//            }
+//        }).start();
+
+    }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        // TODO Auto-generated method stub
+//
+////        outState.putString("photopath", photopath);
+//
+//
+//        super.onSaveInstanceState(outState);
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        // TODO Auto-generated method stub
+//        if (savedInstanceState != null) {
+//            if (savedInstanceState.containsKey("photopath")) {
+////                photopath = savedInstanceState.getString("photopath");
+//            }
+//        }
+//
+//        super.onRestoreInstanceState(savedInstanceState);
+//    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void iniKeyPair()
+    {
+        MyKeyPair.initializeKeyPair();
+    }
 }

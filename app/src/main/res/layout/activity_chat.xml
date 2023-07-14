@@ -80,8 +80,22 @@
             android:background="@drawable/bg_write_msg"
             android:fontFamily="@font/quicksand_medium"
             android:hint="Type Here"
-            android:padding="18dp"
+            android:paddingRight="48dp"
+            android:paddingLeft="15dp"
+            android:paddingVertical="10dp"
             android:textColor="@color/white"></EditText>
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_alignRight="@+id/edt_write"
+            android:layout_centerVertical="true"
+            android:paddingRight="12dp"
+            android:paddingLeft="8dp"
+            android:onClick="tryToCapture"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/camera"
+            android:src="@drawable/cam1"
+            android:layout_height="60dp">
+        </ImageView>
         <ImageView
             android:id="@+id/img_shr"
             android:layout_width="50dp"
