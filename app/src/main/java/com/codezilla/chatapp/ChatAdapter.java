@@ -97,7 +97,7 @@ public class ChatAdapter extends ListAdapter<Message,RecyclerView.ViewHolder> {
 //        Log.d("bugg","here onBind---------------------------------------------------------------------"+position);
 //        Log.d("bugg","here onBind---------------------------------------------------------------------"+getItemCount());
         Message currentMessage= getItem(position);
-        boolean chatDayOk=false;
+        boolean chatDayOk=false ;
         if(position!=0){
             if(!currentMessage.chatDay.equals(getItem(position-1).chatDay)){
 //                Toast.makeText(context, "llc here "+position, Toast.LENGTH_SHORT).show();
